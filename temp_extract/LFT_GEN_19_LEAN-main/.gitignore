@@ -1,0 +1,21 @@
+# Editors and OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Build artifacts
+/build/
+/dist/
+*.aux
+*.log
+*.out
+
+# Python cache
+__pycache__/
+*.pyc
+/.lake
+
+/.lake/
+/build/
+/_target/
+/.lake/
