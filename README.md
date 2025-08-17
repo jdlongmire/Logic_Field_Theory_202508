@@ -79,13 +79,13 @@ LOGIC_FIELD_THEORY_202508
 │   └── README.md
 │
 ├── LFT_002_Derivations_Proofs/
-│   ├── D01-admissible-graphs-foundations.md   # Graphs & admissibility
-│   ├── D02-complex-necessity.md               # ℂ as unique scalar field
-│   ├── D03-gauge-structure-logical-strain.md  # Gauge + unitarity
-│   ├── D04-born-rule.md                       # Born rule derivation
-│   ├── D05-decoherence-scaling.md             # τ_D ∝ 1/ξ² scaling
-│   ├── D06-lagrangian.md                      # Lagrangian formalism
-│   └── D07-predictions.md                     # Predictions & falsifiability
+│   ├── D01-admissible-graphs-foundations.md
+│   ├── D02-complex-necessity.md
+│   ├── D03-gauge-structure-logical-strain.md
+│   ├── D04-born-rule.md
+│   ├── D05-decoherence-scaling.md
+│   ├── D06-lagrangian.md
+│   └── D07-predictions.md
 │
 └── LFT_003_Lean_Proofs/
     ├── .lake/
@@ -95,6 +95,7 @@ LOGIC_FIELD_THEORY_202508
         ├── D03_UnitaryEvolution.lean
         ├── D04_BornRule.lean
         └── D05_StrainWeights.lean
+
 
 ---
 
