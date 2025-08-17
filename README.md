@@ -60,11 +60,31 @@ graph LR
 **Formal verification:** Lean 4 proofs underway for D01–D04, with scaffolding for later derivations.  
 
 **Repository structure (in progress):**
-- `theory/` — Conceptual and philosophical groundwork  
-- `derivations/` — D01–D07 mathematical results  
-- `lean/` — Lean 4 formal proofs  
-- `experiments/` — test design notes and simulation notebooks  
-- `archive/` — drafts, alternative derivations, and prior versions  
+
+├── LFT_001_Documents/ # Position paper and supporting docs
+│ ├── Position Paper/
+│ │ ├── Logic_Field_Theory_202508.pdf # Full position paper (PDF)
+│ │ ├── main.tex # LaTeX source
+│ │ └── references.bib # Bibliography
+│ └── README.md # Local doc readme
+│
+├── LFT_002_Derivations_Proofs/ # Core derivation papers (D01–D07)
+│ ├── D01-admissible-graphs-foundations.md # Graphs satisfying 3FLL; admissibility & complexity
+│ ├── D02-complex-necessity.md # Proof that ℂ is the unique scalar field
+│ ├── D03-gauge-structure-logical-strain.md # Derives unitarity and U(1)×SU(2)×SU(3) gauge groups
+│ ├── D04-born-rule.md # Born rule from path counting and logical strain
+│ ├── D05-decoherence-scaling.md # τ_D ∝ 1/ξ² decoherence scaling from graph complexity
+│ ├── D06-lagrangian.md # Lagrangian formalism from logical consistency
+│ └── D07-predictions.md # Testable predictions and falsifiability roadmap
+│
+└── LFT_003_Lean_Proofs/ # Formal Lean 4 verification
+├── .lake/ # Lean build environment
+└── Core/
+├── D01_Admissibility.lean # Formalization of admissibility checking
+├── D02_ComplexNecessity.lean # Lean proof of ℂ necessity
+├── D03_UnitaryEvolution.lean # Proof of unitarity and Hamiltonian evolution
+├── D04_BornRule.lean # Formal proof of Born rule uniqueness
+└── D05_StrainWeights.lean # Formalization of logical strain weights
 
 ---
 
