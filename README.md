@@ -7,6 +7,7 @@
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/Theory-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16884443.svg)](https://doi.org/10.5281/zenodo.16884443)
 
+Gitpod to run without installing lean 4
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/jdlongmire/Logic_Field_Theory_202508)
 
 
