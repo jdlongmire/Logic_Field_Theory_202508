@@ -64,7 +64,7 @@ graph LR
 
 
 ## Repository Structure
-## Repository Structure
+```text
 
 LOGIC_FIELD_THEORY_202508
 │
@@ -96,7 +96,7 @@ LOGIC_FIELD_THEORY_202508
         ├── D04_BornRule.lean
         └── D05_StrainWeights.lean
 
-
+```
 ---
 
 ## Author
