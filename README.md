@@ -61,30 +61,60 @@ graph LR
 
 **Repository structure (in progress):**
 
-├── LFT_001_Documents/ # Position paper and supporting docs
-│ ├── Position Paper/
-│ │ ├── Logic_Field_Theory_202508.pdf # Full position paper (PDF)
-│ │ ├── main.tex # LaTeX source
-│ │ └── references.bib # Bibliography
-│ └── README.md # Local doc readme
-│
-├── LFT_002_Derivations_Proofs/ # Core derivation papers (D01–D07)
-│ ├── D01-admissible-graphs-foundations.md # Graphs satisfying 3FLL; admissibility & complexity
-│ ├── D02-complex-necessity.md # Proof that ℂ is the unique scalar field
-│ ├── D03-gauge-structure-logical-strain.md # Derives unitarity and U(1)×SU(2)×SU(3) gauge groups
-│ ├── D04-born-rule.md # Born rule from path counting and logical strain
-│ ├── D05-decoherence-scaling.md # τ_D ∝ 1/ξ² decoherence scaling from graph complexity
-│ ├── D06-lagrangian.md # Lagrangian formalism from logical consistency
-│ └── D07-predictions.md # Testable predictions and falsifiability roadmap
-│
-└── LFT_003_Lean_Proofs/ # Formal Lean 4 verification
-├── .lake/ # Lean build environment
-└── Core/
-├── D01_Admissibility.lean # Formalization of admissibility checking
-├── D02_ComplexNecessity.lean # Lean proof of ℂ necessity
-├── D03_UnitaryEvolution.lean # Proof of unitarity and Hamiltonian evolution
-├── D04_BornRule.lean # Formal proof of Born rule uniqueness
-└── D05_StrainWeights.lean # Formalization of logical strain weights
+## Repository Structure
+
+```mermaid
+graph TD
+  ROOT["LOGIC_FIELD_THEORY_202508"]
+
+  subgraph DOCS [LFT_001_Documents]
+    PPDF["Logic_Field_Theory_202508.pdf"]
+    TEX["main.tex"]
+    BIB["references.bib"]
+    RMD["README.md"]
+  end
+
+  subgraph DERIV [LFT_002_Derivations_Proofs]
+    D01["D01 • Admissible Graphs\n(3FLL admissibility & complexity)"]
+    D02["D02 • Complex Necessity\n(ℂ as unique scalar field)"]
+    D03["D03 • Gauge Structure\n(Unitary + U(1)×SU(2)×SU(3))"]
+    D04["D04 • Born Rule\n(Path counting derivation)"]
+    D05["D05 • Decoherence Scaling\n(τ_D ∝ 1/ξ²)"]
+    D06["D06 • Lagrangian\n(Variational formalism)"]
+    D07["D07 • Predictions\n(Falsifiability roadmap)"]
+  end
+
+  subgraph LEAN [LFT_003_Lean_Proofs/Core]
+    L01["D01_Admissibility.lean"]
+    L02["D02_ComplexNecessity.lean"]
+    L03["D03_UnitaryEvolution.lean"]
+    L04["D04_BornRule.lean"]
+    L05["D05_StrainWeights.lean"]
+  end
+
+  ROOT --> DOCS
+  ROOT --> DERIV
+  ROOT --> LEAN
+
+  DOCS --> PPDF
+  DOCS --> TEX
+  DOCS --> BIB
+  DOCS --> RMD
+
+  DERIV --> D01
+  DERIV --> D02
+  DERIV --> D03
+  DERIV --> D04
+  DERIV --> D05
+  DERIV --> D06
+  DERIV --> D07
+
+  LEAN --> L01
+  LEAN --> L02
+  LEAN --> L03
+  LEAN --> L04
+  LEAN --> L05
+```
 
 ---
 
