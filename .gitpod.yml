@@ -1,0 +1,38 @@
+# .gitpod.yml
+image:
+  file: .gitpod.dockerfile
+
+tasks:
+  - name: Verify LFT Derivations
+    init: |
+      echo "Setting up Logic Field Theory verification environment..."
+      cd LFT_003_Lean_Proofs
+      lake build
+    command: |
+      echo "========================================="
+      echo "  Logic Field Theory - Verification Ready"
+      echo "========================================="
+      echo ""
+      echo "Available derivations to verify:"
+      echo "  LFT_003_Lean_Proofs/Core/D01_Admissibility.lean"
+      echo "  LFT_003_Lean_Proofs/Core/D02_ComplexNecessity.lean"
+      echo "  LFT_003_Lean_Proofs/Core/D03_UnitaryEvolution.lean"
+      echo "  LFT_003_Lean_Proofs/Core/D04_BornRule.lean"
+      echo "  LFT_003_Lean_Proofs/Core/D05_StrainWeights.lean"
+      echo ""
+      echo "Run: ./scripts/verify.sh"
+      echo "Or test individual files with: cd LFT_003_Lean_Proofs && lake build Core.D01_Admissibility"
+
+vscode:
+  extensions:
+    - leanprover.lean4
+
+ports:
+  - port: 3000-8999
+    onOpen: ignore
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
