@@ -61,60 +61,40 @@ graph LR
 
 **Repository structure (in progress):**
 
+
+
+## Repository Structure
 ## Repository Structure
 
-```mermaid
-graph TD
-  ROOT["LOGIC_FIELD_THEORY_202508"]
-
-  subgraph DOCS [LFT_001_Documents]
-    PPDF["Logic_Field_Theory_202508.pdf"]
-    TEX["main.tex"]
-    BIB["references.bib"]
-    RMD["README.md"]
-  end
-
-  subgraph DERIV [LFT_002_Derivations_Proofs]
-    D01["D01 • Admissible Graphs\n(3FLL admissibility & complexity)"]
-    D02["D02 • Complex Necessity\n(ℂ as unique scalar field)"]
-    D03["D03 • Gauge Structure\n(Unitary + U(1)×SU(2)×SU(3))"]
-    D04["D04 • Born Rule\n(Path counting derivation)"]
-    D05["D05 • Decoherence Scaling\n(τ_D ∝ 1/ξ²)"]
-    D06["D06 • Lagrangian\n(Variational formalism)"]
-    D07["D07 • Predictions\n(Falsifiability roadmap)"]
-  end
-
-  subgraph LEAN [LFT_003_Lean_Proofs/Core]
-    L01["D01_Admissibility.lean"]
-    L02["D02_ComplexNecessity.lean"]
-    L03["D03_UnitaryEvolution.lean"]
-    L04["D04_BornRule.lean"]
-    L05["D05_StrainWeights.lean"]
-  end
-
-  ROOT --> DOCS
-  ROOT --> DERIV
-  ROOT --> LEAN
-
-  DOCS --> PPDF
-  DOCS --> TEX
-  DOCS --> BIB
-  DOCS --> RMD
-
-  DERIV --> D01
-  DERIV --> D02
-  DERIV --> D03
-  DERIV --> D04
-  DERIV --> D05
-  DERIV --> D06
-  DERIV --> D07
-
-  LEAN --> L01
-  LEAN --> L02
-  LEAN --> L03
-  LEAN --> L04
-  LEAN --> L05
-```
+LOGIC_FIELD_THEORY_202508
+│
+├── .github/
+│   └── workflows/
+│
+├── LFT_001_Documents/
+│   ├── Position Paper/
+│   │   ├── Logic_Field_Theory_202508.pdf
+│   │   ├── main.tex
+│   │   └── references.bib
+│   └── README.md
+│
+├── LFT_002_Derivations_Proofs/
+│   ├── D01-admissible-graphs-foundations.md   # Graphs & admissibility
+│   ├── D02-complex-necessity.md               # ℂ as unique scalar field
+│   ├── D03-gauge-structure-logical-strain.md  # Gauge + unitarity
+│   ├── D04-born-rule.md                       # Born rule derivation
+│   ├── D05-decoherence-scaling.md             # τ_D ∝ 1/ξ² scaling
+│   ├── D06-lagrangian.md                      # Lagrangian formalism
+│   └── D07-predictions.md                     # Predictions & falsifiability
+│
+└── LFT_003_Lean_Proofs/
+    ├── .lake/
+    └── Core/
+        ├── D01_Admissibility.lean
+        ├── D02_ComplexNecessity.lean
+        ├── D03_UnitaryEvolution.lean
+        ├── D04_BornRule.lean
+        └── D05_StrainWeights.lean
 
 ---
 
