@@ -8,7 +8,8 @@ require mathlib from git
 
 lean_lib LFT where
   srcDir := "."
-  roots := #[`Basic, `Core.D01_Admissibility, `Core.D02_ComplexNecessity, `Core.D03_UnitaryEvolution, `Core.D04_BornRule, `Core.D05_StrainWeights]
+  globs := #[.submodules `Core, .submodules `Extensions]
+  -- Automatically includes all .lean files in Core/ and Extensions/ directories
 
 @[default_target]
 lean_exe App where
