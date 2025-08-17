@@ -1,35 +1,20 @@
 name: Lean CI
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      # Install elan/Lean only. Do NOT auto-configure (it expects lake-manifest.json).
-      - name: Install Lean toolchain
+      - name: Install Lean (no auto-config)
         uses: leanprover/lean-action@v1
         with:
+          lake-package-directory: LFT_003_Lean_Proofs
           auto-config: false
           build: false
           test: false
-          use-github-cache: true
-          use-mathlib-cache: true
-
-      # Sanity: required files in subfolder
-      - name: Check package files
-        run: |
-          ls -la LFT_003_Lean_Proofs
-          test -f LFT_003_Lean_Proofs/lean-toolchain
-          test -f LFT_003_Lean_Proofs/lakefile.lean
-
-      # Create the manifest
       - name: lake update
         working-directory: LFT_003_Lean_Proofs
         run: lake update
-
-      # Build
       - name: lake build
         working-directory: LFT_003_Lean_Proofs
         run: lake build
