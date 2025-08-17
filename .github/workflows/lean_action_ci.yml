@@ -1,14 +1,25 @@
-name: Lean Action CI
+name: Lean CI
 
 on:
   push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: LFT_003_Lean_Proofs
     steps:
       - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
+
+      - name: Install elan + Lean
+        uses: leanprover/lean-action@v1
+        with:
+          toolchain: leanprover/lean4:v4.21.0
+
+      - name: Generate manifest
+        run: lake update
+
+      - name: Build
+        run: lake build
