@@ -1,8 +1,8 @@
-# D04-born-rule-proof.md
+# D04: Born Rule from Path Counting
 
 ## Abstract
 
-We derive the Born rule P(k|ψ) = |c_k|² from first principles using logical path counting in configuration space. The proof shows that the quadratic form is the unique probability measure satisfying four fundamental logical requirements. No quantum postulates are assumed—the Born rule emerges necessarily from the structure of logical inference paths.
+We derive the Born rule P(k|ψ) = |c_k|² from first principles using logical path counting in configuration space. Using the logical strain concept from D03 Section 11 to weight paths, we show that the quadratic form is the unique probability measure satisfying four fundamental logical requirements. No quantum postulates are assumed—the Born rule emerges necessarily from the structure of logical inference paths.
 
 ## 1. Path Counting in Logical Configuration Space
 
@@ -17,19 +17,20 @@ where:
 - Each transition [G_i] → [G_{i+1}] represents a valid logical inference rule
 - The transition preserves admissibility: [G_i], [G_{i+1}] ∈ A/∼
 
-### 1.2 Path Weights from Logical Structure
+### 1.2 Path Weights from Logical Strain
 
-**Definition D4.2 (Transition Weight).** The weight of transition [G_i] → [G_{i+1}] is determined by the logical strain cost:
+**Definition D4.2 (Transition Weight).** The weight of transition [G_i] → [G_{i+1}] is determined by the logical strain change:
 
 $$w_i = \exp(-\beta \Delta D_{i,i+1})$$
 
 where:
-- ΔD_{i,i+1} = D([G_{i+1}]) - D([G_i]) is the strain change (from Section 3)
+- ΔD_{i,i+1} = D([G_{i+1}]) - D([G_i]) is the strain change (from D03 Section 11.1)
 - β = 1/T_logical is the inverse logical temperature
-- For transitions with ΔD < 0 (strain-reducing), w_i approaches 1
-- For transitions with ΔD > 0 (strain-increasing), w_i < 1
+- The exponential form is justified in D03 Section 11.6
+- For transitions with ΔD < 0 (strain-reducing), w_i > 1 (favored)
+- For transitions with ΔD > 0 (strain-increasing), w_i < 1 (suppressed)
 
-**Remark:** This grounding in strain ensures weights are derived from LFT structure, not postulated. In the limit β → ∞ (zero logical temperature), only minimum-strain paths contribute.
+**Remark:** The strain D(G) quantifies logical tension as defined in D03 Section 11, ensuring weights are derived from logical structure, not postulated. In the limit β → ∞ (zero logical temperature), only minimum-strain paths contribute.
 
 ### 1.3 Path Amplitudes from Oriented Cycles
 
@@ -39,7 +40,7 @@ $$θ_p = \sum_{j=1}^m n_j θ_{C_j}$$
 
 where:
 - n_j = winding number (times cycle C_j is traversed)
-- θ_{C_j} = orientation angle of cycle C_j (from Section 4.4.3)
+- θ_{C_j} = orientation angle of cycle C_j (from D02 Section 3)
 - Sign depends on traversal direction (clockwise +, counterclockwise -)
 
 **Definition D4.4 (Path Amplitude).** The complex amplitude for path p is:
@@ -47,7 +48,7 @@ where:
 $$A_p = \left(\prod_{i=1}^n w_i\right) \cdot e^{iθ_p}$$
 
 where:
-- Product of weights = exp(-β Σ_i ΔD_{i,i+1}) = path probability factor
+- Product of weights = exp(-β Σ_i ΔD_{i,i+1}) = strain-based probability factor
 - Phase factor = accumulated orientation from cycle traversals
 
 ### 1.4 Total Configuration Amplitude
@@ -56,7 +57,7 @@ where:
 
 $$c_{[G_{final}]} = \sum_{j=1}^m A_{p_j} = \sum_{j=1}^m \left(\prod_i w_i^{(j)}\right) e^{iθ_{p_j}}$$
 
-*Proof:* Paths represent alternative logical derivations. By the principle of logical superposition (Section 4.2), indeterminate alternatives must be combined linearly with their respective amplitudes. □
+*Proof:* Paths represent alternative logical derivations. By the principle of logical superposition (from D02's complex structure), indeterminate alternatives must be combined linearly with their respective amplitudes. □
 
 ## 2. Logical Requirements for Probability Measures
 
@@ -149,7 +150,7 @@ Therefore f(x) = x^n.
 
 Consider a general two-configuration system with amplitudes c₁, c₂.
 
-The standard normalization convention (from Section 4's inner product) gives:
+The standard normalization convention (from D02's Hilbert space structure) gives:
 $$|c_1|^2 + |c_2|^2 = 1$$
 
 By L1 with K = 1:
@@ -197,11 +198,11 @@ No other measure satisfies L1-L4 with complex path amplitudes.
 
 ### 4.1 When Measurement Occurs
 
-From Section 3, measurement is triggered when logical strain exceeds coherence capacity:
+From D03 Section 11.5, measurement is triggered when logical strain exceeds the critical threshold:
 
-$$D(ψ) > σ_{critical} \Rightarrow \text{measurement event}$$
+$$D(ψ) > D_{critical} \Rightarrow \text{measurement event}$$
 
-This determines **when** collapse happens (strain threshold), not the probabilities.
+This determines **when** collapse happens (strain threshold exceeded), not the probabilities.
 
 ### 4.2 What Outcomes Occur
 
@@ -210,12 +211,12 @@ This determines **when** collapse happens (strain threshold), not the probabilit
 $$P(k|ψ) = |⟨k|ψ⟩|² = |c_k|²$$
 
 *Proof:* By Theorems D4.2-D4.4, this is the unique measure consistent with:
-- Path interference (complex amplitudes from cycles)
+- Path interference (complex amplitudes from oriented cycles)
 - Logical requirements (L1-L4)
 - Continuity (physical measurability)
 - Standard normalization (⟨ψ|ψ⟩ = 1)
 
-The strain mechanism triggers measurement, but outcome selection follows the unique path-counting measure. □
+The strain mechanism (D03 Section 11) triggers measurement, but outcome selection follows the unique path-counting measure. □
 
 ## 5. Examples
 
@@ -224,6 +225,8 @@ The strain mechanism triggers measurement, but outcome selection follows the uni
 Consider paths through two slits to detector position x:
 - Path through slit 1: amplitude A₁e^{iθ₁} with A₁ = exp(-βD₁)
 - Path through slit 2: amplitude A₂e^{iθ₂} with A₂ = exp(-βD₂)
+
+Where D₁, D₂ are the logical strains (D03 Section 11) of the respective paths.
 
 Total amplitude: c(x) = A₁e^{iθ₁} + A₂e^{iθ₂}
 
@@ -235,8 +238,8 @@ The interference term 2A₁A₂cos(θ₁ - θ₂) arises necessarily from path s
 
 For spin-1/2 in state |ψ⟩ = α|↑⟩ + β|↓⟩ with |α|² + |β|² = 1:
 
-Paths to |↑⟩ outcome: amplitude α
-Paths to |↓⟩ outcome: amplitude β
+Paths to |↑⟩ outcome: amplitude α (weighted by strain)
+Paths to |↓⟩ outcome: amplitude β (weighted by strain)
 
 By Theorem D4.4:
 - P(↑) = |α|²
@@ -259,31 +262,40 @@ If experiments found P ∝ |ψ|^n with n ≠ 2:
 
 ### 6.2 Testing Path Weight Structure
 
-The strain-based weights predict:
+The strain-based weights (D03 Section 11.6) predict:
 1. **Temperature dependence:** Lower T_logical → sharper path selection
 2. **Strain correlations:** High-strain paths contribute less to amplitude
-3. **Threshold behavior:** Paths with D > σ_critical are suppressed
+3. **Threshold behavior:** Paths with D > D_critical are suppressed
 
 ## 7. Summary
 
 **Main Result:** The Born rule P = |c|² is the unique probability measure satisfying:
-1. Path amplitudes sum as complex numbers (orientation from cycles)
+1. Path amplitudes sum as complex numbers (orientation from D02)
 2. Normalization (L1)
 3. Logical additivity (L2) 
 4. Phase invariance (L3)
 5. System factorization (L4)
 6. Continuity/measurability
 
-**Key Improvements in Final Version:**
-- Path weights w_i explicitly tied to strain via exp(-βΔD)
-- Continuity assumption stated explicitly for Cauchy equation
-- Logical equivalence clarified in amplitude dependence
-- Normalization argument shows both K = 1 and n = 2 uniquely
+**Key Dependencies:**
+- Uses logical strain from D03 Section 11 for path weights
+- Uses complex structure from D02 for oriented amplitudes
+- Provides Born rule for D05's decoherence analysis
 
 **Not Circular:** The derivation uses only:
-- Logical path structure (graph transitions)
+- Logical path structure (graph transitions from D01)
 - Complex amplitudes (from D02 orientation requirement)
+- Logical strain (from D03 Section 11)
 - Basic probability axioms (L1-L4)
 - No quantum postulates
 
 The Born rule emerges as the unique measure consistent with logical path counting in complex configuration space.
+
+## References
+
+- D01: Admissible graphs and graph transitions
+- D02: Complex necessity from orientation
+- D03 Section 11: Logical strain definition and properties
+- D05: Size-dependent decoherence using Born rule
+- Cauchy (1821): Functional equations
+- Feynman (1948): Path integral formulation (comparison)
