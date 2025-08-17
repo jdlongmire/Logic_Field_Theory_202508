@@ -24,13 +24,15 @@ Instead of taking quantum mechanics as a starting postulate, LFT derives its str
 - **Born rule** |c|² is derived via logical path counting.  
 - **Decoherence scaling** τ_D ∝ 1/ξ² emerges from constraint density in 3D.  
 - **Lagrangian dynamics** appear as the minimal framework preserving logical consistency.  
-
+---
 The project combines **derivation papers**, **formal Lean 4 proofs**, and **AI-assisted theorem proving** to construct a fully verifiable framework.
 ---
 ## Derivation Flow
 
+The seven core derivations (D01–D07) build on one another as follows:
+
+```mermaid
 graph LR
-  %% LFT Derivation Flow (D01–D07)
   D01["D01 • Admissible Graphs"] --> D02["D02 • Complex Necessity"]
   D01 --> D03["D03 • Gauge Structure"]
   D02 --> D03
@@ -39,6 +41,7 @@ graph LR
   D04 --> D07["D07 • Predictions"]
   D05 --> D07
   D06["D06 • Lagrangian Formalism"] --> D07
+```
 ---
 
 ## Progress
