@@ -1,5 +1,5 @@
-namespace Lean_Proofs
+namespace LFT
 
 def addOne (n : Nat) := n + 1
 
-end Lean_Proofs
+end LFT

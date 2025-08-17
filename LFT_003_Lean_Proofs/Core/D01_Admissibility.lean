@@ -1,6 +1,8 @@
 -- D01_Admissibility.lean (Final Version)
 -- Admissibility checker implementing the Three Fundamental Laws of Logic
 
+namespace LFT.Core
+
 structure LogicalGraph where
   vertices : List String
   edges : List (String × String)
@@ -82,3 +84,5 @@ def testGraphNoIdentity : LogicalGraph := {
 
 -- Complexity: O(V³) where V = |vertices|
 theorem complexity_cubic : True := trivial
+
+end LFT.Core
