@@ -1,0 +1,237 @@
+/-
+Core.L02_StateStructure.lean
+Depends on: Core.L01_ThreeLogicLaws (Lean 4.21.0 / mathlib4)
+-/
+import Core.L01_ThreeLogicLaws
+import Mathlib.Data.Real.Basic
+import Mathlib.Data.Complex.Basic
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+
+/-!
+# L02 — Quantum Observables and Emergent Uncertainty (scaffold)
+
+Instantiates a nontrivial `World` where some measurements can be `none`.
+Defines position/momentum predicates, a measurement aligned with them (incl. negation),
+proves `measurement_correct`, and derives an uncertainty-style indeterminacy lemma.
+-/
+
+namespace LFT
+open Classical
+
+/-! ## States and precision -/
+
+structure QuantumState where
+  position_amplitude  : ℝ → ℂ
+  momentum_amplitude  : ℝ → ℂ
+
+structure Precision where
+  value    : ℝ
+  positive : 0 < value
+
+noncomputable def position_measurement (ε : Precision) (s : QuantumState) : Option ℝ :=
+  if h : ∃ x, Complex.abs (s.position_amplitude x) ^ 2 > 1 - ε.value
+  then some (Classical.choose h) else none
+
+noncomputable def momentum_measurement (δ : Precision) (s : QuantumState) : Option ℝ :=
+  if h : ∃ p, Complex.abs (s.momentum_amplitude p) ^ 2 > 1 - δ.value
+  then some (Classical.choose h) else none
+
+/-! ## Observable predicates -/
+
+abbrev PState := Predicate QuantumState
+
+def positionPredicate (x : ℝ) (ε : Precision) : PState :=
+  fun s =>
+    match position_measurement ε s with
+    | some x' => |x' - x| < ε.value
+    | none    => False
+
+def momentumPredicate (p : ℝ) (δ : Precision) : PState :=
+  fun s =>
+    match momentum_measurement δ s with
+    | some p' => |p' - p| < δ.value
+    | none    => False
+
+/-- Smallest family of quantum observables *as a Type* so we can eliminate into data. -/
+inductive QObs : PState → Type
+| pos  (x : ℝ) (ε : Precision) : QObs (positionPredicate x ε)
+| mom  (p : ℝ) (δ : Precision) : QObs (momentumPredicate p δ)
+| not  {P : PState} : QObs P → QObs (fun s => ¬ P s)
+
+def quantumObservables : Set PState := { P | Nonempty (QObs P) }
+
+/-! ## Measurement aligned with predicates (and negation) -/
+
+noncomputable def quantumMeasurement :
+  ∀ {P : PState}, QObs P → (QuantumState → Option Bool)
+| _, QObs.pos x ε =>
+    fun s =>
+      match position_measurement ε s with
+      | none    => none
+      | some x' => if h : |x' - x| < ε.value then some true else some false
+| _, QObs.mom p δ =>
+    fun s =>
+      match momentum_measurement δ s with
+      | none    => none
+      | some p' => if h : |p' - p| < δ.value then some true else some false
+| _, QObs.not hP =>
+    fun s => (quantumMeasurement hP s).map Bool.not
+
+lemma quantumMeasurement_correct :
+  ∀ {P} (hP : QObs P) (s : QuantumState),
+    (quantumMeasurement hP s = some true  → P s) ∧
+    (quantumMeasurement hP s = some false → ¬ P s)
+| _, QObs.pos x ε, s =>
+  by
+    constructor
+    · intro h
+      dsimp [quantumMeasurement]; cases hmeas : position_measurement ε s with
+      | none      => simp [hmeas] at h
+      | some x'   =>
+        by_cases hb : |x' - x| < ε.value
+        · simpa [hmeas, hb, positionPredicate]
+        · simp [hmeas, hb] at h
+    · intro h
+      dsimp [quantumMeasurement]; cases hmeas : position_measurement ε s with
+      | none      => simp [hmeas, positionPredicate] at h
+      | some x'   =>
+        by_cases hb : |x' - x| < ε.value
+        · simp [hmeas, hb] at h
+        · simpa [hmeas, hb, positionPredicate]
+| _, QObs.mom p δ, s =>
+  by
+    constructor
+    · intro h
+      dsimp [quantumMeasurement]; cases hmeas : momentum_measurement δ s with
+      | none      => simp [hmeas] at h
+      | some p'   =>
+        by_cases hb : |p' - p| < δ.value
+        · simpa [hmeas, hb, momentumPredicate]
+        · simp [hmeas, hb] at h
+    · intro h
+      dsimp [quantumMeasurement]; cases hmeas : momentum_measurement δ s with
+      | none      => simp [hmeas, momentumPredicate] at h
+      | some p'   =>
+        by_cases hb : |p' - p| < δ.value
+        · simp [hmeas, hb] at h
+        · simpa [hmeas, hb, momentumPredicate]
+| _, QObs.not hP, s =>
+  by
+    constructor
+    · -- some true for ¬P ⇒ base measured some false ⇒ ¬P s
+      intro h
+      dsimp [quantumMeasurement] at h
+      cases h' : quantumMeasurement hP s with
+      | none      => simp [h'] at h
+      | some b    =>
+        cases b with
+        | true  => simp [h'] at h        -- impossible
+        | false =>
+          have : quantumMeasurement hP s = some false := by simpa [h']
+          exact (quantumMeasurement_correct hP s).2 this
+    · -- some false for ¬P ⇒ base measured some true ⇒ ¬(¬P s) i.e. P s
+      intro h
+      dsimp [quantumMeasurement] at h
+      cases h' : quantumMeasurement hP s with
+      | none      => simp [h'] at h
+      | some b    =>
+        cases b with
+        | true  =>
+          have : quantumMeasurement hP s = some true := by simpa [h']
+          -- need ¬(¬P s) ≡ P s
+          exact (by
+            -- P here is (fun s => ¬ P₀ s)
+            -- so ¬ P s is ¬¬ P₀ s; we must produce P₀ s
+            -- (quantumMeasurement_correct hP s).1 gives P₀ s
+            exact (quantumMeasurement_correct hP s).1 this)
+        | false =>
+          simp [h'] at h
+
+/-! ## Assemble the quantum world -/
+
+noncomputable def quantumWorld : World QuantumState where
+  pred := quantumObservables
+  measurement := (fun {P} hP => quantumMeasurement (Classical.choice hP))
+  measurement_correct := by
+    intro P hP s
+    exact quantumMeasurement_correct (Classical.choice hP) s
+  closedUnderNot := by
+    intro P hP
+    rcases hP with ⟨w⟩
+    exact ⟨QObs.not w⟩
+
+/-! ## Uncertainty as a logical constraint -/
+
+axiom uncertainty_relation :
+  ∀ (s : QuantumState) (ε δ : Precision),
+    ε.value * δ.value < 1 / (4 * Real.pi) →
+    ¬ ( (∃ x, position_measurement ε s = some x) ∧
+        (∃ p, momentum_measurement δ s = some p) )
+
+theorem precise_both_violates_logic
+  (s : QuantumState) (ε δ : Precision)
+  (h : ε.value * δ.value < 1 / (4 * Real.pi)) :
+  ∃ (P : PState) (hP : P ∈ quantumObservables),
+    quantumWorld.measurement hP s = none :=
+by
+  have H := uncertainty_relation s ε δ h
+  by_cases hp : ∃ x, position_measurement ε s = some x
+  · -- momentum must be indeterminate
+    have h_no_p : ¬ (∃ p, momentum_measurement δ s = some p) := by
+      intro hex; exact H ⟨hp, hex⟩
+    refine ⟨momentumPredicate 0 δ, ⟨QObs.mom 0 δ⟩, ?_⟩
+    dsimp [quantumWorld, World.measurement, quantumMeasurement]
+    have : momentum_measurement δ s = none := by
+      classical
+      cases hmeas : momentum_measurement δ s with
+      | none    => simpa [hmeas]
+      | some p  => exact (h_no_p ⟨p, hmeas⟩).elim
+    simp [this]
+  · -- position is indeterminate
+    refine ⟨positionPredicate 0 ε, ⟨QObs.pos 0 ε⟩, ?_⟩
+    dsimp [quantumWorld, World.measurement, quantumMeasurement]
+    have : position_measurement ε s = none := by
+      classical
+      cases hmeas : position_measurement ε s with
+      | none    => simpa [hmeas]
+      | some x  => exact hp ⟨x, hmeas⟩
+    simp [this]
+
+theorem uncertainty_from_logic
+  (s : QuantumState) (x p : ℝ) (ε δ : Precision)
+  (hx : positionPredicate x ε s)
+  (hp : momentumPredicate p δ s)
+  (hprecise : ε.value * δ.value < 1 / (4 * Real.pi)) :
+  s ∉ PhysicalReality quantumWorld :=
+by
+  have hx' : ∃ x₀, position_measurement ε s = some x₀ := by
+    dsimp [positionPredicate] at hx
+    cases hmeas : position_measurement ε s with
+    | none    => simpa [hmeas] using hx
+    | some x₀ => exact ⟨x₀, hmeas⟩
+  have hp' : ∃ p₀, momentum_measurement δ s = some p₀ := by
+    dsimp [momentumPredicate] at hp
+    cases hmeas : momentum_measurement δ s with
+    | none    => simpa [hmeas] using hp
+    | some p₀ => exact ⟨p₀, hmeas⟩
+  have contra := uncertainty_relation s ε δ hprecise
+  intro hs
+  exact contra ⟨hx', hp'⟩
+
+/-! ## Superposition (rename to avoid clash with L01) -/
+
+def inSuperpositionQM (s : QuantumState) : Prop :=
+  ∃ ε : Precision, ε.value < 1 ∧ position_measurement ε s = none
+
+theorem superposition_can_violate_EM
+  (s : QuantumState) (h : inSuperpositionQM s) :
+  ∃ (P : PState) (hP : P ∈ quantumObservables),
+    quantumWorld.measurement hP s = none :=
+by
+  rcases h with ⟨ε, _, hnone⟩
+  refine ⟨positionPredicate 0 ε, ⟨QObs.pos 0 ε⟩, ?_⟩
+  dsimp [quantumWorld, World.measurement, quantumMeasurement]
+  simp [hnone]
+
+end LFT

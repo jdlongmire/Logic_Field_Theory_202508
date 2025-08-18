@@ -2,164 +2,275 @@ import Mathlib.Logic.Basic
 import Mathlib.Data.Set.Basic
 
 /-!
-# The Three Fundamental Laws of Logic as Physical Constraints
+# Observable Determinacy as a Constraint on Physical Reality
 
 This module establishes the foundational framework for Logic Field Theory (LFT).
-We define the Three Fundamental Laws and show how they constrain possible states.
+We show how the requirement for determinate observables constrains physical reality.
+
+## Core Principle
+Physical Reality requires all observables to have determinate values.
+Superposition states have indeterminate observables, which is why they're not in Physical Reality
+until measurement occurs. This is a physical constraint, not a logical one.
 
 ## Main Definitions
-- `State` - An abstract representation of a possible state in reality
-- `satisfies_identity` - The Identity Law for states
-- `satisfies_noncontradiction` - The Non-Contradiction Law for predicates
-- `satisfies_excluded_middle` - The Excluded Middle Law for predicates
-- `LogicallyConsistent` - States that satisfy all three laws
-- `PhysicalReality` - The subset of states that are logically consistent
+- `State` - An abstract representation of a possible state
+- `World` - Specifies which predicates are observable/meaningful
+- `hasDeterminateObservables` - All observables yield definite values (not the Law of Excluded Middle!)
+- `PhysicalReality` - The subset of states with determinate observables
 -/
 
 namespace LFT
-
 open Classical
 
-/-- An abstract state that could potentially exist.
-    We make minimal assumptions about its structure. -/
-structure State (α : Type*) where
-  carrier : α
+/-!
+## Core Structures
+-/
+
+/-- A state represents a possible configuration of reality.
+    We use a type alias for now but can add structure later. -/
+abbrev State (α : Type*) := α
+
 /-- A predicate is a property that might hold for a state -/
 def Predicate (α : Type*) := State α → Prop
 
-section ThreeLaws
+/-- A World specifies which predicates are physically observable.
+    Observable predicates have associated measurements that may be
+    determinate (some true/false) or indeterminate (none). -/
+structure World (α : Type*) where
+  /-- The set of observable predicates -/
+  pred : Set (Predicate α)
+  /-- Each observable predicate has an associated measurement -/
+  measurement : ∀ {P}, P ∈ pred → (State α → Option Bool)
+  /-- Measurement outcomes determine predicate truth values when determinate -/
+  measurement_correct : ∀ {P} (hP : P ∈ pred) (s : State α),
+    (measurement hP s = some true → P s) ∧
+    (measurement hP s = some false → ¬P s)
+  /-- Observable predicates are closed under negation -/
+  closedUnderNot : ∀ {P} (_hP : P ∈ pred),
+    (fun s => ¬P s) ∈ pred
+
+/-!
+## The Three Fundamental Laws of Logic
+
+Note: These are the actual laws of logic, which are NOT violated by quantum mechanics.
+-/
+
+section ActualLogicLaws
 
 variable {α : Type*}
 
 /-- The Law of Identity: A thing equals itself.
-    This is trivial in Lean but we make it explicit. -/
-def satisfies_identity (s : State α) : Prop :=
-  s = s
+    This is always satisfied, even in quantum mechanics. -/
+def satisfiesIdentity (_s : State α) : Prop :=
+  True
 
-/-- The Law of Non-Contradiction: A predicate cannot be both true and false
-    for the same state at the same time. -/
-def satisfies_noncontradiction (s : State α) (P : Predicate α) : Prop :=
+/-- The Law of Non-Contradiction: A predicate cannot be both true and false.
+    This is always satisfied - no quantum state has contradictory properties. -/
+def satisfiesNoncontradiction (P : Predicate α) (s : State α) : Prop :=
   ¬(P s ∧ ¬P s)
 
-/-- The Law of Excluded Middle: A predicate is either true or false
-    for any given state (no third option). -/
-def satisfies_excluded_middle (s : State α) (P : Predicate α) : Prop :=
+/-- The Law of Excluded Middle: A predicate is either true or false.
+    This is always satisfied - even for superposition states!
+    (If a particle doesn't have definite position x, then "has position x" is false.) -/
+def satisfiesExcludedMiddle (P : Predicate α) (s : State α) : Prop :=
   P s ∨ ¬P s
 
-/-- A state is logically consistent if it satisfies all three fundamental laws
-    for all possible predicates. -/
-structure LogicallyConsistent (s : State α) : Prop where
-  identity : satisfies_identity s
-  noncontradiction : ∀ P : Predicate α, satisfies_noncontradiction s P
-  excluded_middle : ∀ P : Predicate α, satisfies_excluded_middle s P
+/-- All states satisfy the three laws of logic, including quantum states -/
+theorem logic_laws_always_hold (s : State α) (P : Predicate α) :
+    satisfiesIdentity s ∧
+    satisfiesNoncontradiction P s ∧
+    satisfiesExcludedMiddle P s := by
+  constructor
+  · trivial
+  constructor
+  · intro h; exact h.2 h.1
+  · exact Classical.em (P s)
 
-end ThreeLaws
+end ActualLogicLaws
 
-section BasicTheorems
+/-!
+## Observable Determinacy (The Real Constraint)
+-/
+
+section ObservableDeterminacy
 
 variable {α : Type*}
 
-/-- Identity always holds - this is a logical necessity, not an empirical fact -/
-theorem identity_always_holds (s : State α) : satisfies_identity s :=
+/-- A state has determinate observables if all measurements yield definite values.
+    This is NOT about logic - it's about whether observables have definite values. -/
+def hasDeterminateObservables (w : World α) (s : State α) : Prop :=
+  ∀ {P} (hP : P ∈ w.pred),
+    w.measurement hP s = some true ∨ w.measurement hP s = some false
+
+/-- An observable is indeterminate for a state if measurement yields none -/
+def hasIndeterminateObservable (w : World α) (s : State α) (P : Predicate α)
+    (hP : P ∈ w.pred) : Prop :=
+  w.measurement hP s = none
+
+/-- Physical reality consists of states with all observables determinate.
+    This is our key physical postulate, not a logical requirement. -/
+def PhysicalReality (w : World α) : Set (State α) :=
+  {s : State α | hasDeterminateObservables w s}
+
+end ObservableDeterminacy
+
+/-!
+## Simp Lemmas for Automation
+-/
+
+section SimpLemmas
+
+variable {α : Type*}
+
+@[simp] lemma mem_physicalReality {w : World α} {s : State α} :
+    s ∈ PhysicalReality w ↔ hasDeterminateObservables w s :=
+  Iff.rfl
+
+@[simp] lemma satisfiesIdentity_simp (_s : State α) :
+    satisfiesIdentity _s = True :=
   rfl
 
-/-- In classical logic, non-contradiction always holds -/
-theorem noncontradiction_holds_classically (s : State α) (P : Predicate α) :
-    satisfies_noncontradiction s P := by
-  intro h
-  exact h.2 h.1
+@[simp] lemma logic_laws_hold_simp (s : State α) (P : Predicate α) :
+    satisfiesNoncontradiction P s ∧ satisfiesExcludedMiddle P s := by
+  exact (logic_laws_always_hold s P).2
 
-/-- In classical logic, excluded middle always holds -/
-theorem excluded_middle_holds_classically (s : State α) (P : Predicate α) :
-    satisfies_excluded_middle s P := by
-  exact Classical.em (P s)
+end SimpLemmas
 
-/-- Using classical logic from Lean, all states are logically consistent.
-    This seems trivial but establishes our baseline. -/
-theorem all_states_consistent_classically (s : State α) :
-    LogicallyConsistent s := by
-  constructor
-  · exact identity_always_holds s
-  · exact noncontradiction_holds_classically s
-  · exact excluded_middle_holds_classically s
+/-!
+## Classical vs Quantum Worlds
+-/
 
-end BasicTheorems
-
-section PhysicalReality
+section WorldExamples
 
 variable {α : Type*}
 
-/-- The logical consistency function L maps states to a measure of consistency.
-    For now, in classical logic, this is always true. -/
-def L (s : State α) : Prop :=
-  LogicallyConsistent s
+/-- The classical world where all predicates are observable and determinate.
+    In this world, all states are in Physical Reality. -/
+noncomputable def classicalWorld (α : Type*) : World α where
+  pred := Set.univ
+  measurement := fun {P} _ s => if P s then some true else some false
+  measurement_correct := by
+    intro P hP s
+    constructor
+    · intro h
+      by_cases hPs : P s
+      · exact hPs
+      · simp [if_neg hPs] at h
+    · intro h
+      by_cases hPs : P s
+      · simp [if_pos hPs] at h
+      · exact hPs
+  closedUnderNot := fun _ => Set.mem_univ _
 
-/-- Physical reality consists of all logically consistent states.
-    In our classical framework, this is all states, but this definition
-    prepares for more refined theories where some states might violate logic. -/
-def PhysicalReality (α : Type*) : Set (State α) :=
-  {s : State α | L s}
+/-- In the classical world, all observables are determinate -/
+lemma classicalDeterminate (s : State α) :
+    hasDeterminateObservables (classicalWorld α) s := by
+  intro P hP
+  by_cases h : P s
+  · simp [classicalWorld, h]
+  · simp [classicalWorld, h]
 
-/-- In classical logic, physical reality includes all states -/
-theorem physical_reality_is_all_states_classically :
-    ∀ (s : State α), s ∈ PhysicalReality α := by
-  intro s
-  simp [PhysicalReality, L]
-  exact all_states_consistent_classically s
+/-- In classical world, physical reality is all states -/
+theorem classicalRealityIsAll :
+    PhysicalReality (classicalWorld α) = Set.univ := by
+  ext s
+  constructor
+  · intro _; trivial
+  · intro _; exact classicalDeterminate s
 
-/-- Physical reality is non-empty (there exists at least one consistent state) -/
-theorem physical_reality_nonempty (α : Type*) [Inhabited α] :
-    Set.Nonempty (PhysicalReality α) := by
-  use ⟨default⟩
-  exact physical_reality_is_all_states_classically _
+/-- A quantum world where some observables can be indeterminate.
+    This is where Physical Reality becomes a proper subset! -/
+structure QuantumWorld (α : Type*) extends World α where
+  /-- At least one observable is indeterminate at some state -/
+  has_indeterminate : ∃ (P : Predicate α) (hP : P ∈ pred) (s : State α),
+    measurement hP s = none
 
-end PhysicalReality
-
-section Observations
-
-/-!
-## Key Observations
-
-While these results seem trivial in classical logic, they establish important facts:
-
-1. The 3FLL are not independent - in classical logic, they're all theorems
-2. Every conceivable state satisfies the 3FLL in our framework
-3. The interesting physics must come from additional structure on states
-
-The next step will be to add structure (quantum amplitudes, spacetime positions, etc.)
-and see how the 3FLL constrain the dynamics and interactions of these structured states.
--/
-
-/-- Two states are logically equivalent if they satisfy the same predicates -/
-def logically_equivalent (s₁ s₂ : State α) : Prop :=
-  ∀ P : Predicate α, P s₁ ↔ P s₂
-
-/-- Logical equivalence is an equivalence relation -/
-theorem logical_equivalence_is_equivalence :
-    Equivalence (@logically_equivalent α) :=
-  ⟨fun _ _ => Iff.rfl,
-   fun h P => (h P).symm,
-   fun h₁₂ h₂₃ P => Iff.trans (h₁₂ P) (h₂₃ P)⟩
-
-end Observations
-
-section NextSteps
+end WorldExamples
 
 /-!
-## Foundation for Future Development
-
-This basic framework provides:
-1. Precise definitions of the 3FLL
-2. A notion of logical consistency for states
-3. A definition of physical reality as logically consistent states
-
-Next modules will:
-- Add quantum structure (amplitudes, Hilbert spaces)
-- Show how dynamics must preserve logical consistency
-- Derive the Born rule and Schrödinger equation
-- Prove uniqueness theorems for physical laws
+## Key Results: Indeterminate Observables Constrain Reality
 -/
 
-end NextSteps
+section IndeterminacyConstraints
+
+variable {α : Type*}
+
+/-- If an observable is indeterminate, the state is not in Physical Reality -/
+theorem indeterminate_not_in_reality {w : World α} {s : State α}
+    {P : Predicate α} (hP : P ∈ w.pred)
+    (h_indet : hasIndeterminateObservable w s P hP) :
+    s ∉ PhysicalReality w := by
+  intro h_in
+  have h_det := h_in hP
+  unfold hasIndeterminateObservable at h_indet
+  cases h_det with
+  | inl h_true => rw [h_indet] at h_true; cases h_true
+  | inr h_false => rw [h_indet] at h_false; cases h_false
+
+/-- In a quantum world, not all states are in Physical Reality -/
+theorem quantumRealityIsProperSubset (w : QuantumWorld α) :
+    PhysicalReality w.toWorld ≠ Set.univ := by
+  obtain ⟨P, hP, s, h_indet⟩ := w.has_indeterminate
+  intro h_eq
+  have h_not_in := indeterminate_not_in_reality hP h_indet
+  rw [h_eq] at h_not_in
+  exact h_not_in (Set.mem_univ s)
+
+/-- Concrete example: A maximally indeterminate quantum world -/
+example : QuantumWorld Unit := {
+  toWorld := {
+    pred := Set.univ
+    measurement := fun {_P} _hP _s => none  -- Everything indeterminate!
+    measurement_correct := fun {_P} _hP _s => by
+      constructor <;> intro h <;> cases h  -- none ≠ some _
+    closedUnderNot := fun {_P} _hP => Set.mem_univ _
+  }
+  has_indeterminate := ⟨fun _ => True, Set.mem_univ _, (), rfl⟩
+}
+
+end IndeterminacyConstraints
+
+/-!
+## Connection to Physics (Corrected Interpretation)
+-/
+
+section PhysicsConnection
+
+variable {α : Type*}
+
+/-- Measurement forces observables to become determinate.
+    This is not about logic - it's about physical measurement. -/
+theorem measurementForcesDeterminacy (w : World α) (s : State α)
+    (P : Predicate α) (hP : P ∈ w.pred) :
+    s ∈ PhysicalReality w →
+    (w.measurement hP s = some true ∨ w.measurement hP s = some false) := by
+  intro h_in
+  exact h_in hP
+
+/-- Superposition: States with indeterminate observables.
+    These states don't violate logic - they just have undefined measurements. -/
+def inSuperposition (w : World α) (s : State α) : Prop :=
+  ∃ (P : Predicate α) (hP : P ∈ w.pred), hasIndeterminateObservable w s P hP
+
+/-- Superposition states are not in Physical Reality until measured -/
+theorem superposition_not_in_reality {w : World α} {s : State α}
+    (h_super : inSuperposition w s) :
+    s ∉ PhysicalReality w := by
+  obtain ⟨P, hP, h_indet⟩ := h_super
+  exact indeterminate_not_in_reality hP h_indet
+
+/-- The conceptualize-actualize asymmetry: We can describe states with
+    indeterminate observables, but they cannot exist in Physical Reality -/
+theorem conceptual_vs_actual (w : QuantumWorld α) :
+    ∃ s : State α,
+      inSuperposition w.toWorld s ∧
+      s ∉ PhysicalReality w.toWorld := by
+  obtain ⟨P, hP, s, h_indet⟩ := w.has_indeterminate
+  use s
+  constructor
+  · use P, hP, h_indet
+  · exact indeterminate_not_in_reality hP h_indet
+
+end PhysicsConnection
 
 end LFT
